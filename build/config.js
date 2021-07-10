@@ -6,20 +6,25 @@ const replace = require('rollup-plugin-replace')
 const node = require('rollup-plugin-node-resolve')
 const flow = require('rollup-plugin-flow-no-whitespace')
 const version = process.env.VERSION || require('../package.json').version
-const weexVersion = process.env.WEEX_VERSION || require('../packages/weex-vue-framework/package.json').version
+const weexVersion =
+  process.env.WEEX_VERSION || require('../packages/weex-vue-framework/package.json').version
 
 const banner =
   '/*!\n' +
-  ' * Vue.js v' + version + '\n' +
-  ' * (c) 2014-' + new Date().getFullYear() + ' Evan You\n' +
+  ' * Vue.js v' +
+  version +
+  '\n' +
+  ' * (c) 2014-' +
+  new Date().getFullYear() +
+  ' Evan You\n' +
   ' * Released under the MIT License.\n' +
   ' */'
 
 const weexFactoryPlugin = {
-  intro () {
+  intro() {
     return 'module.exports = function weexFactory (exports, document) {'
   },
-  outro () {
+  outro() {
     return '}'
   }
 }
@@ -28,6 +33,7 @@ const aliases = require('./alias')
 const resolve = p => {
   const base = p.split('/')[0]
   if (aliases[base]) {
+    //  aliases[base]: src/platforms/web + /entry-runtime-with-compiler.js
     return path.resolve(aliases[base], p.slice(base.length + 1))
   } else {
     return path.resolve(__dirname, '../', p)
@@ -168,7 +174,7 @@ const builds = {
   }
 }
 
-function genConfig (name) {
+function genConfig(name) {
   const opts = builds[name]
   const config = {
     input: opts.entry,
@@ -192,9 +198,11 @@ function genConfig (name) {
   }
 
   if (opts.env) {
-    config.plugins.push(replace({
-      'process.env.NODE_ENV': JSON.stringify(opts.env)
-    }))
+    config.plugins.push(
+      replace({
+        'process.env.NODE_ENV': JSON.stringify(opts.env)
+      })
+    )
   }
 
   Object.defineProperty(config, '_name', {

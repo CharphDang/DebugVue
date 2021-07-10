@@ -15,22 +15,21 @@ const idToTemplate = cached(id => {
 })
 
 const mount = Vue.prototype.$mount
-Vue.prototype.$mount = function (
-  el?: string | Element,
-  hydrating?: boolean
-): Component {
+
+// * 复写$mount方法
+Vue.prototype.$mount = function (el?: string | Element, hydrating?: boolean): Component {
   el = el && query(el)
 
   /* istanbul ignore if */
   if (el === document.body || el === document.documentElement) {
-    process.env.NODE_ENV !== 'production' && warn(
-      `Do not mount Vue to <html> or <body> - mount to normal elements instead.`
-    )
+    process.env.NODE_ENV !== 'production' &&
+      warn(`Do not mount Vue to <html> or <body> - mount to normal elements instead.`)
     return this
   }
 
   const options = this.$options
   // resolve template/el and convert to render function
+  //  * priority: render -> template -> el
   if (!options.render) {
     let template = options.template
     if (template) {
@@ -39,10 +38,7 @@ Vue.prototype.$mount = function (
           template = idToTemplate(template)
           /* istanbul ignore if */
           if (process.env.NODE_ENV !== 'production' && !template) {
-            warn(
-              `Template element not found or is empty: ${options.template}`,
-              this
-            )
+            warn(`Template element not found or is empty: ${options.template}`, this)
           }
         }
       } else if (template.nodeType) {
@@ -62,11 +58,15 @@ Vue.prototype.$mount = function (
         mark('compile')
       }
 
-      const { render, staticRenderFns } = compileToFunctions(template, {
-        shouldDecodeNewlines,
-        delimiters: options.delimiters,
-        comments: options.comments
-      }, this)
+      const { render, staticRenderFns } = compileToFunctions(
+        template,
+        {
+          shouldDecodeNewlines,
+          delimiters: options.delimiters,
+          comments: options.comments
+        },
+        this
+      )
       options.render = render
       options.staticRenderFns = staticRenderFns
 
@@ -84,7 +84,7 @@ Vue.prototype.$mount = function (
  * Get outerHTML of elements, taking care
  * of SVG elements in IE as well.
  */
-function getOuterHTML (el: Element): string {
+function getOuterHTML(el: Element): string {
   if (el.outerHTML) {
     return el.outerHTML
   } else {
