@@ -186,6 +186,7 @@ export function mountComponent(vm: Component, el: ?Element, hydrating?: boolean)
     }
   }
 
+  console.log('真正的mount方法中,此处在对组件实例进行实例化Watcher', vm) // Charph-log
   vm._watcher = new Watcher(vm, updateComponent, noop)
   hydrating = false
 

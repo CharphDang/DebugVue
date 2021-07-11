@@ -63,6 +63,7 @@ export function initMixin(Vue: Class<Component>) {
     }
 
     if (vm.$options.el) {
+      console.log('当el存在的时候，自动挂载 ') // Charph-log
       vm.$mount(vm.$options.el)
     }
   }

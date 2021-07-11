@@ -11,16 +11,20 @@
     <div id="demo">
       调试页面
       <p>{{user.name}}</p>
+      <comp></comp>
     </div>
     <script>
+      //   Vue.component('comp', {
+      //     template: '<p>this is a component</p>'
+      //   })
       new Vue({
-        el: "#demo",
+        el: '#demo',
         data: {
           user: {
-            name: "Charph",
-          },
-        },
-      });
+            name: 'Charph'
+          }
+        }
+      })
     </script>
   </body>
 </html>
