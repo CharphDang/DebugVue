@@ -1880,23 +1880,27 @@ var initProxy;
 
 /*  */
 
-var normalizeEvent = cached(function (name) {
-  var passive = name.charAt(0) === '&';
-  name = passive ? name.slice(1) : name;
-  var once$$1 = name.charAt(0) === '~'; // Prefixed last, checked first
-  name = once$$1 ? name.slice(1) : name;
-  var capture = name.charAt(0) === '!';
-  name = capture ? name.slice(1) : name;
-  return {
-    name: name,
-    once: once$$1,
-    capture: capture,
-    passive: passive
+var normalizeEvent = cached(
+  function (
+    name
+  ) {
+    var passive = name.charAt(0) === '&';
+    name = passive ? name.slice(1) : name;
+    var once$$1 = name.charAt(0) === '~'; // Prefixed last, checked first
+    name = once$$1 ? name.slice(1) : name;
+    var capture = name.charAt(0) === '!';
+    name = capture ? name.slice(1) : name;
+    return {
+      name: name,
+      once: once$$1,
+      capture: capture,
+      passive: passive
+    }
   }
-});
+);
 
-function createFnInvoker (fns) {
-  function invoker () {
+function createFnInvoker(fns) {
+  function invoker() {
     var arguments$1 = arguments;
 
     var fns = invoker.fns;
@@ -1914,7 +1918,7 @@ function createFnInvoker (fns) {
   return invoker
 }
 
-function updateListeners (
+function updateListeners(
   on,
   oldOn,
   add,
@@ -1927,14 +1931,13 @@ function updateListeners (
     old = oldOn[name];
     event = normalizeEvent(name);
     if (isUndef(cur)) {
-      "development" !== 'production' && warn(
-        "Invalid handler for event \"" + (event.name) + "\": got " + String(cur),
-        vm
-      );
+      "development" !== 'production' &&
+        warn("Invalid handler for event \"" + (event.name) + "\": got " + String(cur), vm);
     } else if (isUndef(old)) {
       if (isUndef(cur.fns)) {
         cur = on[name] = createFnInvoker(cur);
       }
+      // * 获取event name and cb， 然后执行add方法添加到当前target DOM上
       add(event.name, cur, event.once, event.capture, event.passive);
     } else if (cur !== old) {
       old.fns = cur;
@@ -6642,7 +6645,7 @@ function genDefaultModel (
 
 /*  */
 
-function normalizeEvents (on) {
+function normalizeEvents(on) {
   /* istanbul ignore if */
   if (isDef(on[RANGE_TOKEN])) {
     // IE input[type=range] only supports `change` event
@@ -6654,49 +6657,32 @@ function normalizeEvents (on) {
 
 var target$1;
 
-function add$1 (
-  event,
-  handler,
-  once$$1,
-  capture,
-  passive
-) {
+function add$1(event, handler, once$$1, capture, passive) {
   if (once$$1) {
     var oldHandler = handler;
     var _target = target$1; // save current target element in closure
     handler = function (ev) {
-      var res = arguments.length === 1
-        ? oldHandler(ev)
-        : oldHandler.apply(null, arguments);
+      var res = arguments.length === 1 ? oldHandler(ev) : oldHandler.apply(null, arguments);
       if (res !== null) {
         remove$2(event, handler, capture, _target);
       }
     };
   }
-  target$1.addEventListener(
-    event,
-    handler,
-    supportsPassive
-      ? { capture: capture, passive: passive }
-      : capture
-  );
+  // * 这里是event定义的地方，可以看到，target是当前的真实dom元素，所以，vue并没有使用事件委托机制
+  target$1.addEventListener(event, handler, supportsPassive ? { capture: capture, passive: passive } : capture);
 }
 
-function remove$2 (
-  event,
-  handler,
-  capture,
-  _target
-) {
+function remove$2(event, handler, capture, _target) {
   (_target || target$1).removeEventListener(event, handler, capture);
 }
 
-function updateDOMListeners (oldVnode, vnode) {
+function updateDOMListeners(oldVnode, vnode) {
   if (isUndef(oldVnode.data.on) && isUndef(vnode.data.on)) {
     return
   }
   var on = vnode.data.on || {};
   var oldOn = oldVnode.data.on || {};
+
   target$1 = vnode.elm;
   normalizeEvents(on);
   updateListeners(on, oldOn, add$1, remove$2, vnode.context);

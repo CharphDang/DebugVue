@@ -3,28 +3,32 @@
 import { warn } from 'core/util/index'
 import { cached, isUndef } from 'shared/util'
 
-const normalizeEvent = cached((name: string): {
-  name: string,
-  once: boolean,
-  capture: boolean,
-  passive: boolean
-} => {
-  const passive = name.charAt(0) === '&'
-  name = passive ? name.slice(1) : name
-  const once = name.charAt(0) === '~' // Prefixed last, checked first
-  name = once ? name.slice(1) : name
-  const capture = name.charAt(0) === '!'
-  name = capture ? name.slice(1) : name
-  return {
-    name,
-    once,
-    capture,
-    passive
+const normalizeEvent = cached(
+  (
+    name: string
+  ): {
+    name: string,
+    once: boolean,
+    capture: boolean,
+    passive: boolean
+  } => {
+    const passive = name.charAt(0) === '&'
+    name = passive ? name.slice(1) : name
+    const once = name.charAt(0) === '~' // Prefixed last, checked first
+    name = once ? name.slice(1) : name
+    const capture = name.charAt(0) === '!'
+    name = capture ? name.slice(1) : name
+    return {
+      name,
+      once,
+      capture,
+      passive
+    }
   }
-})
+)
 
-export function createFnInvoker (fns: Function | Array<Function>): Function {
-  function invoker () {
+export function createFnInvoker(fns: Function | Array<Function>): Function {
+  function invoker() {
     const fns = invoker.fns
     if (Array.isArray(fns)) {
       const cloned = fns.slice()
@@ -40,7 +44,7 @@ export function createFnInvoker (fns: Function | Array<Function>): Function {
   return invoker
 }
 
-export function updateListeners (
+export function updateListeners(
   on: Object,
   oldOn: Object,
   add: Function,
@@ -53,14 +57,13 @@ export function updateListeners (
     old = oldOn[name]
     event = normalizeEvent(name)
     if (isUndef(cur)) {
-      process.env.NODE_ENV !== 'production' && warn(
-        `Invalid handler for event "${event.name}": got ` + String(cur),
-        vm
-      )
+      process.env.NODE_ENV !== 'production' &&
+        warn(`Invalid handler for event "${event.name}": got ` + String(cur), vm)
     } else if (isUndef(old)) {
       if (isUndef(cur.fns)) {
         cur = on[name] = createFnInvoker(cur)
       }
+      // * 获取event name and cb， 然后执行add方法添加到当前target DOM上
       add(event.name, cur, event.once, event.capture, event.passive)
     } else if (cur !== old) {
       old.fns = cur
